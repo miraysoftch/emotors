@@ -1,12 +1,7 @@
-import { db } from '@/lib/db'
-import { user, verification } from '@/lib/db/schema'
+import { db, getPool } from '@/lib/db'
+import { user, account } from '@/lib/db/schema'
 import { hash } from 'better-auth/crypto'
-import { Pool } from 'pg'
 import crypto from 'crypto'
-
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-})
 
 async function seed() {
   try {
@@ -16,6 +11,7 @@ async function seed() {
     const adminId = crypto.randomUUID()
     const hashedPassword = await hash('Blevh4np1@@')
 
+    // Insert user
     await db.insert(user).values({
       id: adminId,
       name: 'Admin',
@@ -26,8 +22,17 @@ async function seed() {
       updatedAt: new Date(),
     })
 
-    // Store hashed password (Better Auth stores this separately via the account table)
-    // For now, we'll add a direct entry with the credentials
+    // Insert account with hashed password for email/password authentication
+    await db.insert(account).values({
+      id: crypto.randomUUID(),
+      userId: adminId,
+      type: 'email',
+      provider: 'credential',
+      providerAccountId: 'info@mk-emotorsdornach.ch',
+      password: hashedPassword,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    })
 
     console.log('✅ Database seeded successfully!')
     console.log('')
@@ -41,7 +46,8 @@ async function seed() {
     console.error('❌ Seeding failed:', error)
     process.exit(1)
   } finally {
-    await pool.end()
+    const pool = getPool()
+    if (pool) await pool.end()
   }
 }
 

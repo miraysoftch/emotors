@@ -1,9 +1,18 @@
 import fs from 'fs'
 import path from 'path'
+import { dirname } from 'path'
+import { fileURLToPath } from 'url'
+import pg from 'pg'
 
+const __dirname = dirname(fileURLToPath(import.meta.url))
 const root = process.cwd()
 const dataDir = path.join(root, '.data')
 if (!fs.existsSync(dataDir)) fs.mkdirSync(dataDir, { recursive: true })
+
+// Initialize database connection
+const pool = new pg.Pool({
+  connectionString: process.env.DATABASE_URL,
+})
 
 const categoryPlan = [
   ['Allgemein', 'allgemein', 20, ['Firma', 'Produkte', 'Marken', 'Bestellung', 'Kundenkonto', 'Sicherheit', 'Kontakt', 'Showroom']],
@@ -164,4 +173,71 @@ for (const [category, categorySlug, count, topics] of categoryPlan) {
 
 fs.writeFileSync(path.join(dataDir, 'faq-categories.json'), JSON.stringify(categories, null, 2))
 fs.writeFileSync(path.join(dataDir, 'faqs.json'), JSON.stringify(faqs, null, 2))
-console.log(`Seeded ${categories.length} FAQ categories and ${faqs.length} FAQs.`)
+
+// Seed to database
+async function seedFaqsToDb() {
+  try {
+    console.log('🌱 Seeding FAQs to database...')
+    const client = await pool.connect()
+
+    try {
+      // Create faq_categories table if it doesn't exist
+      await client.query(`
+        CREATE TABLE IF NOT EXISTS faq_categories (
+          id SERIAL PRIMARY KEY,
+          name TEXT NOT NULL,
+          slug TEXT NOT NULL UNIQUE,
+          description TEXT,
+          seo_title TEXT,
+          seo_description TEXT,
+          active BOOLEAN DEFAULT true,
+          "order" INTEGER DEFAULT 0,
+          "createdAt" TIMESTAMP DEFAULT NOW(),
+          "updatedAt" TIMESTAMP DEFAULT NOW()
+        )
+      `)
+
+      // Truncate existing data
+      await client.query('TRUNCATE TABLE faqs CASCADE')
+      await client.query('TRUNCATE TABLE faq_categories CASCADE')
+
+      // Insert categories
+      for (const category of categories) {
+        await client.query(
+          `INSERT INTO faq_categories (name, slug, description, seo_title, seo_description, active, "order", "createdAt", "updatedAt")
+           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
+          [
+            category.name,
+            category.slug,
+            category.description,
+            category.seoTitle,
+            category.seoDescription,
+            category.active,
+            category.order,
+            new Date(),
+            new Date(),
+          ]
+        )
+      }
+
+      // Insert FAQs
+      for (const faq of faqs) {
+        await client.query(
+          `INSERT INTO faqs (question, answer, category, "order", "createdAt", "updatedAt")
+           VALUES ($1, $2, $3, $4, $5, $6)`,
+          [faq.question, faq.answer, faq.category, faq.order, new Date(), new Date()]
+        )
+      }
+
+      console.log(`✅ Seeded ${categories.length} FAQ categories and ${faqs.length} FAQs to database.`)
+    } finally {
+      client.release()
+    }
+  } catch (error) {
+    console.error('❌ Database seeding failed:', error)
+  } finally {
+    await pool.end()
+  }
+}
+
+seedFaqsToDb()
