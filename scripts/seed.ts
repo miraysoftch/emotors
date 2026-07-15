@@ -1,6 +1,6 @@
 import { db, getPool } from '@/lib/db'
 import { user, account } from '@/lib/db/schema'
-import { hash } from 'better-auth/crypto'
+import { hashPassword } from 'better-auth/crypto'
 import crypto from 'crypto'
 
 async function seed() {
@@ -9,7 +9,7 @@ async function seed() {
 
     // Create admin user
     const adminId = crypto.randomUUID()
-    const hashedPassword = await hash('Blevh4np1@@')
+    const hashedPassword = await hashPassword('Blevh4np1@@')
 
     // Insert user
     await db.insert(user).values({
