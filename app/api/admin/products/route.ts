@@ -149,7 +149,7 @@ export async function POST(request: NextRequest) {
 
     // Check for duplicate by slug
     let duplicate = await db
-      .select({ id: products.id })
+      .select({ id: products.id, slug: products.slug, sku: products.sku, ean: products.ean })
       .from(products)
       .where(eq(products.slug, payload.slug))
       .limit(1)
@@ -157,7 +157,7 @@ export async function POST(request: NextRequest) {
     // Check for duplicate SKU
     if (!duplicate.length && payload.sku) {
       duplicate = await db
-        .select({ id: products.id })
+        .select({ id: products.id, slug: products.slug, sku: products.sku, ean: products.ean })
         .from(products)
         .where(eq(products.sku, payload.sku))
         .limit(1)
@@ -166,7 +166,7 @@ export async function POST(request: NextRequest) {
     // Check for duplicate EAN
     if (!duplicate.length && payload.ean) {
       duplicate = await db
-        .select({ id: products.id })
+        .select({ id: products.id, slug: products.slug, sku: products.sku, ean: products.ean })
         .from(products)
         .where(eq(products.ean, payload.ean))
         .limit(1)
