@@ -122,6 +122,16 @@ export default function LoginPage() {
               </div>
             </div>
 
+            {/* Forgot Password Link */}
+            <div className="text-right">
+              <Link
+                href="/forgot-password"
+                className="text-sm text-primary hover:underline"
+              >
+                Şifremi unuttum
+              </Link>
+            </div>
+
             {/* Login Button */}
             <button
               type="button"

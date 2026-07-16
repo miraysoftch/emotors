@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getPool } from '@/lib/db'
+import { verifyPassword } from '@/lib/admin-auth'
 import crypto from 'crypto'
-import { verifyPassword } from 'better-auth/crypto'
 
 export async function POST(request: NextRequest) {
   try {
