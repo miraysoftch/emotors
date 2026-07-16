@@ -4,7 +4,7 @@ export function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname
 
   // Allow access to /admin/login and login-related endpoints without authentication
-  if (pathname === '/admin/login' || pathname === '/api/admin/login-slider' || pathname === '/api/admin/login') {
+  if (pathname === '/admin/login' || pathname === '/api/admin/login-slider' || pathname === '/api/admin/login' || pathname === '/api/admin/reset-lock') {
     return NextResponse.next()
   }
 

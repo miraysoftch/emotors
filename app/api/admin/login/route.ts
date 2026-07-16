@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import {
   verifyPassword,
+  verifyAdminPassword,
   isAccountLocked,
   recordFailedAttempt,
   clearFailedAttempts,
@@ -33,8 +34,8 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Verify password
-    if (!verifyPassword(password, credentials.passwordHash)) {
+    // Verify password (use dynamic verification from env vars)
+    if (!verifyAdminPassword(password)) {
       recordFailedAttempt('admin')
       recordLoginHistory(false, request.headers.get('x-forwarded-for') || undefined)
       return NextResponse.json(
