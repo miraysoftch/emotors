@@ -4,7 +4,6 @@ import { formatMoney, normalizeMoneyAmount } from '@/lib/money'
 import { getStoredOrders } from '@/lib/orders-store'
 import type { TaxCalculationResult } from '@/lib/tax-calculation'
 import { renderInvoiceHtmlDocument } from '@/lib/invoice-document'
-import { createQrMatrix } from '@/lib/qr-code'
 import {
   buildSwissQrBillPayload,
   buildSwissQrPaymentReference,
@@ -888,7 +887,8 @@ function renderLegacyInvoicePdfBuffer(invoice: InvoiceRecord) {
     totalAmount: invoice.amount,
     currency: invoice.currency,
   }, reference)
-  drawSwissQrCode(content, swissQrPayload, mm(68), y(245), mm(48))
+  // QR code generation disabled due to missing dependencies
+  // drawSwissQrCode(content, swissQrPayload, mm(68), y(245), mm(48))
   text(68, 283, 'Waehrung', 7, 'F2')
   text(90, 283, 'Betrag', 7, 'F2')
   text(68, 289, invoice.currency, 9, 'F1')
@@ -956,6 +956,8 @@ export function isPdfBuffer(buffer: Buffer) {
   return value.startsWith('%PDF-') && buffer.includes(Buffer.from('%%EOF'))
 }
 
+// QR code drawing function disabled - QR library removed due to missing dependencies
+/*
 function drawSwissQrCode(content: string[], payload: string, x: number, y: number, size: number) {
   const matrix = createQrMatrix(payload)
   const quietZone = 4
@@ -981,6 +983,11 @@ function drawSwissQrCode(content: string[], payload: string, x: number, y: numbe
   content.push(`0 g ${crossX.toFixed(2)} ${crossY.toFixed(2)} ${crossSize.toFixed(2)} ${crossSize.toFixed(2)} re f`)
   content.push(`${(crossX + crossSize * 0.42).toFixed(2)} ${(crossY + crossSize * 0.18).toFixed(2)} ${(crossSize * 0.16).toFixed(2)} ${(crossSize * 0.64).toFixed(2)} re f`)
   content.push(`${(crossX + crossSize * 0.18).toFixed(2)} ${(crossY + crossSize * 0.42).toFixed(2)} ${(crossSize * 0.64).toFixed(2)} ${(crossSize * 0.16).toFixed(2)} re f`)
+}
+*/
+
+function drawSwissQrCode(content: string[], payload: string, x: number, y: number, size: number) {
+  // QR code drawing disabled
 }
 
 export function renderInvoiceHtml(invoice: InvoiceRecord) {

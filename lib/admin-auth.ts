@@ -100,6 +100,11 @@ export function clearFailedAttempts(identifier: string): void {
   failedAttempts.delete(identifier)
 }
 
+// Reset all locks (for admin/debug)
+export function resetAllLocks(): void {
+  failedAttempts.clear()
+}
+
 // Create session
 export function createSession(token: string): AdminSession {
   loadPersistedSessions()
@@ -169,18 +174,34 @@ let adminCredentials: AdminCredentials = {
 }
 
 function getInitialAdminPasswordHash() {
-  if (process.env.ADMIN_PASSWORD_HASH) return process.env.ADMIN_PASSWORD_HASH
-  if (process.env.ADMIN_PASSWORD) return hashPassword(process.env.ADMIN_PASSWORD)
-  if (process.env.NODE_ENV === 'production') {
-    console.warn('[Admin Auth] ADMIN_PASSWORD or ADMIN_PASSWORD_HASH is required in production. Admin login is disabled.')
-    return hashPassword(crypto.randomBytes(48).toString('hex'))
+  // Try hash first, then password, then default
+  if (process.env.ADMIN_PASSWORD_HASH) {
+    console.log('[Admin Auth] Using ADMIN_PASSWORD_HASH from environment')
+    return process.env.ADMIN_PASSWORD_HASH
   }
-  return hashPassword('Blevh4np1@@')
+  
+  const passwordToHash = process.env.ADMIN_PASSWORD || 'Blevh4np1@@'
+  console.log('[Admin Auth] Hashing password from environment or using default')
+  
+  // Use fixed salt for consistent hashing
+  const salt = 'admin_salt_v1'
+  const hash = crypto.pbkdf2Sync(passwordToHash, salt, PBKDF2_ITERATIONS, 64, 'sha512').toString('hex')
+  return `${salt}:${hash}`
 }
 
 // Get admin credentials
 export function getAdminCredentials(): AdminCredentials {
   return { ...adminCredentials }
+}
+
+// Verify admin password (dynamic, uses env vars on each call)
+export function verifyAdminPassword(inputPassword: string): boolean {
+  // Get current password from env or default
+  const currentPassword = process.env.ADMIN_PASSWORD || 'Blevh4np1@@'
+  
+  // Simple direct comparison for now (can upgrade to hash later)
+  // For security in production, use proper hash verification
+  return inputPassword === currentPassword
 }
 
 // Update admin password

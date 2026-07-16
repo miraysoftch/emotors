@@ -147,16 +147,30 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(created, { status: 201 })
     }
 
-    const duplicateConditions = [
-      eq(products.slug, payload.slug),
-      ...(payload.sku ? [eq(products.sku, payload.sku)] : []),
-      ...(payload.ean ? [eq(products.ean, payload.ean)] : []),
-    ]
-    const duplicate = await db
-      .select()
+    // Check for duplicate by slug
+    let duplicate = await db
+      .select({ id: products.id, slug: products.slug, sku: products.sku, ean: products.ean })
       .from(products)
-      .where(or(...duplicateConditions))
+      .where(eq(products.slug, payload.slug))
       .limit(1)
+    
+    // Check for duplicate SKU
+    if (!duplicate.length && payload.sku) {
+      duplicate = await db
+        .select({ id: products.id, slug: products.slug, sku: products.sku, ean: products.ean })
+        .from(products)
+        .where(eq(products.sku, payload.sku))
+        .limit(1)
+    }
+    
+    // Check for duplicate EAN
+    if (!duplicate.length && payload.ean) {
+      duplicate = await db
+        .select({ id: products.id, slug: products.slug, sku: products.sku, ean: products.ean })
+        .from(products)
+        .where(eq(products.ean, payload.ean))
+        .limit(1)
+    }
 
     if (duplicate.length > 0) {
       const existing = duplicate[0]
@@ -171,13 +185,32 @@ export async function POST(request: NextRequest) {
       }, { status: 409 })
     }
 
+    // Prepare product data for insertion
+    const insertData = {
+      id: crypto.randomUUID(),
+      title: payload.title || '',
+      slug: payload.slug || '',
+      price: payload.price ? parseFloat(String(payload.price)) : null,
+      discount_price: payload.discount_price ? parseFloat(String(payload.discount_price)) : null,
+      short_description: payload.short_description || null,
+      description: payload.description || null,
+      long_description: payload.long_description || null,
+      category_id: payload.category_id || null,
+      brand: payload.brand || null,
+      sku: payload.sku || null,
+      ean: payload.ean || null,
+      image: payload.image || null,
+      active: payload.active !== false,
+      archived: payload.archived === true,
+      specs: payload.specs ? JSON.stringify(payload.specs) : null,
+      metadata: payload.metadata ? JSON.stringify(payload.metadata) : null,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    }
+
     const result = await db
       .insert(products)
-      .values({
-        ...payload,
-        active: payload.active !== false,
-        archived: payload.archived === true,
-      })
+      .values(insertData)
       .returning()
 
     return NextResponse.json(result[0], { status: 201 })

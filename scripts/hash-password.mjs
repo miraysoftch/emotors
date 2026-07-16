@@ -1,5 +1,5 @@
-import { hash } from 'better-auth/plugins/two-factor'
+import { hashPassword } from 'better-auth/crypto'
 
 const password = 'Blevh4np1@@'
-const hashed = await hash(password)
+const hashed = await hashPassword(password)
 console.log('Hashed password:', hashed)

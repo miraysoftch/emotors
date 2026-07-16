@@ -30,6 +30,7 @@ export const account = pgTable('account', {
   type: text('type').notNull(),
   provider: text('provider').notNull(),
   providerAccountId: text('providerAccountId').notNull(),
+  password: text('password'), // For email/password authentication
   refreshToken: text('refreshToken'),
   accessToken: text('accessToken'),
   expiresAt: timestamp('expiresAt'),
@@ -52,18 +53,18 @@ export const verification = pgTable('verification', {
 
 // App Tables
 export const products = pgTable('products', {
-  id: serial('id').primaryKey(),
+  id: text('id').primaryKey(),
   slug: text('slug').notNull().unique(),
   title: text('title').notNull(),
   short_description: text('short_description'),
   description: text('description'),
   long_description: text('long_description'),
-  price: integer('price').notNull(),
-  discount_price: integer('discount_price'),
-  discount_percentage: integer('discount_percentage'),
-  monthly_price: integer('monthly_price'),
-  category_id: integer('category_id').references(() => categories.id),
-  subcategory_id: integer('subcategory_id').references(() => categories.id),
+  price: text('price'),
+  discount_price: text('discount_price'),
+  discount_percentage: text('discount_percentage'),
+  monthly_price: text('monthly_price'),
+  category_id: text('category_id').references(() => categories.id),
+  subcategory_id: text('subcategory_id').references(() => categories.id),
   brand: text('brand'),
   sku: text('sku'),
   ean: text('ean'),
@@ -73,11 +74,11 @@ export const products = pgTable('products', {
   pdf_url: text('pdf_url'), // Technical documentation
   downloads: jsonb('downloads').default({}), // Multiple downloadable files
   image_360: text('image_360'), // 360 image support
-  power_watts: integer('power_watts'),
+  power_watts: text('power_watts'),
   battery_capacity: text('battery_capacity'),
-  range_km: integer('range_km'),
-  max_speed: integer('max_speed'),
-  weight_kg: integer('weight_kg'),
+  range_km: text('range_km'),
+  max_speed: text('max_speed'),
+  weight_kg: text('weight_kg'),
   charge_time: text('charge_time'),
   max_load: text('max_load'),
   warranty: text('warranty'),
@@ -184,13 +185,13 @@ export const hero_sliders = pgTable('hero_sliders', {
 })
 
 export const categories = pgTable('categories', {
-  id: serial('id').primaryKey(),
+  id: text('id').primaryKey(),
   name: text('name').notNull(),
   slug: text('slug').notNull().unique(),
   description: text('description'),
   long_description: text('long_description'),
   type: text('type').default('main'), // main, subcategory
-  parent_id: integer('parent_id').references(() => categories.id, { onDelete: 'set null' }),
+  parent_id: text('parent_id').references(() => categories.id, { onDelete: 'set null' }),
   license_required: boolean('license_required').default(false),
   icon: text('icon'), // icon URL or emoji
   image: text('image'), // category image URL

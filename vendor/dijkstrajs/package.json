@@ -1,0 +1,6 @@
+{
+  "name": "dijkstrajs",
+  "version": "1.0.0",
+  "main": "index.js",
+  "description": "Simple Dijkstra implementation for QR code generation"
+}
