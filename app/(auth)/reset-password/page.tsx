@@ -58,14 +58,18 @@ function ResetPasswordContent() {
         }),
       })
 
-      const data = await response.json()
-
       if (!response.ok) {
-        setError(data.error || 'Şifre sıfırlama başarısız')
+        try {
+          const errorData = await response.json()
+          setError(errorData.error || 'Şifre sıfırlama başarısız')
+        } catch {
+          setError('Şifre sıfırlama başarısız')
+        }
         setLoading(false)
         return
       }
 
+      const data = await response.json()
       console.log('[v0] Password reset successful')
       setSuccess(true)
       setLoading(false)
