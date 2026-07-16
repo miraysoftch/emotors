@@ -163,7 +163,14 @@ async function resolveTrustedOrderItems(items: SubmittedOrderItem[]) {
 
   try {
     if (db) {
-      const dbProducts = await db.select().from(productTable).limit(1000)
+      const dbProducts = await db.select({
+        id: productTable.id,
+        slug: productTable.slug,
+        title: productTable.title,
+        price: productTable.price,
+        image: productTable.image,
+        stock_quantity: productTable.stock_quantity,
+      }).from(productTable).limit(1000)
       catalogProducts = dbProducts.length > 0 ? dbProducts : catalogProducts
     }
   } catch (error) {

@@ -60,7 +60,24 @@ export async function GET(req: NextRequest) {
       })
     }
 
-    let query = db.select().from(products)
+    let query = db.select({
+      id: products.id,
+      slug: products.slug,
+      title: products.title,
+      price: products.price,
+      description: products.description,
+      short_description: products.short_description,
+      category_id: products.category_id,
+      brand: products.brand,
+      sku: products.sku,
+      stock_quantity: products.stock_quantity,
+      featured: products.featured,
+      bestseller: products.bestseller,
+      active: products.active,
+      archived: products.archived,
+      image: products.image,
+      createdAt: products.createdAt,
+    }).from(products)
 
     if (search) {
       query = query.where(ilike(products.title, `%${search}%`))
