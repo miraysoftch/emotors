@@ -147,16 +147,30 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(created, { status: 201 })
     }
 
-    const duplicateConditions = [
-      eq(products.slug, payload.slug),
-      ...(payload.sku ? [eq(products.sku, payload.sku)] : []),
-      ...(payload.ean ? [eq(products.ean, payload.ean)] : []),
-    ]
-    const duplicate = await db
-      .select()
+    // Check for duplicate by slug
+    let duplicate = await db
+      .select({ id: products.id })
       .from(products)
-      .where(or(...duplicateConditions))
+      .where(eq(products.slug, payload.slug))
       .limit(1)
+    
+    // Check for duplicate SKU
+    if (!duplicate.length && payload.sku) {
+      duplicate = await db
+        .select({ id: products.id })
+        .from(products)
+        .where(eq(products.sku, payload.sku))
+        .limit(1)
+    }
+    
+    // Check for duplicate EAN
+    if (!duplicate.length && payload.ean) {
+      duplicate = await db
+        .select({ id: products.id })
+        .from(products)
+        .where(eq(products.ean, payload.ean))
+        .limit(1)
+    }
 
     if (duplicate.length > 0) {
       const existing = duplicate[0]
