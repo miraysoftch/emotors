@@ -3,8 +3,8 @@ import { NextRequest, NextResponse } from 'next/server'
 export function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname
 
-  // Allow access to /admin/login without authentication
-  if (pathname === '/admin/login') {
+  // Allow access to /admin/login and login-related endpoints without authentication
+  if (pathname === '/admin/login' || pathname === '/api/admin/login-slider' || pathname === '/api/admin/login') {
     return NextResponse.next()
   }
 
