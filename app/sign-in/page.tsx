@@ -59,9 +59,14 @@ export default function SignInPage() {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email, phone }),
         })
-        const availabilityData = await availability.json()
+        let availabilityData: { error?: string; available?: boolean } = {}
+        try {
+          availabilityData = await availability.json()
+        } catch {
+          availabilityData = {}
+        }
         if (!availability.ok) {
-          setError(availabilityData.error || 'Diese Daten sind bereits in unserem System registriert.')
+          setError(availabilityData.error || 'Die Registrierung konnte nicht geprüft werden. Bitte versuchen Sie es erneut.')
           setLoading(false)
           return
         }
