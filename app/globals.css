@@ -723,7 +723,6 @@
   ::-webkit-scrollbar-thumb:hover {
     background: color-mix(in oklab, var(--accent) 45%, var(--border-strong));
   }
-}
 
 @layer components {
   .theme-card {
