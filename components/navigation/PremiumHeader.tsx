@@ -100,6 +100,18 @@ export function PremiumHeader() {
               <button className="p-2 hover:bg-secondary rounded-lg transition-colors">
                 <User size={20} className="text-foreground" />
               </button>
+              <label className="sr-only" htmlFor="theme-select">Theme auswählen</label>
+              <select
+                id="theme-select"
+                value={resolvedTheme}
+                onChange={(event) => setTheme(event.target.value as 'hell' | 'dunkel' | 'carbon' | 'glass')}
+                className="rounded-lg border border-border bg-card px-2 py-2 text-xs font-semibold text-foreground"
+              >
+                <option value="dunkel">Luxury Black</option>
+                <option value="hell">Hell</option>
+                <option value="carbon">Carbon Fiber</option>
+                <option value="glass">Glass Black</option>
+              </select>
               <button onClick={() => setCartOpen(true)} className="relative p-2 hover:bg-secondary rounded-lg transition-colors" aria-label="Warenkorb öffnen">
                 <ShoppingBag size={20} className="text-foreground" />
                 {cartCount > 0 && (

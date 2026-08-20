@@ -2,11 +2,11 @@
 
 import { createContext, useContext, useEffect, useLayoutEffect, useState } from 'react'
 
-type Theme = 'hell' | 'dunkel'
+export type Theme = 'hell' | 'dunkel' | 'carbon' | 'glass'
 
 interface ThemeContextType {
   theme: Theme
-  resolvedTheme: 'hell' | 'dunkel'
+  resolvedTheme: Theme
   setTheme: (theme: Theme) => void
 }
 
@@ -14,7 +14,7 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined)
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [theme, setThemeState] = useState<Theme>('dunkel')
-  const [resolvedTheme, setResolvedTheme] = useState<'hell' | 'dunkel'>('dunkel')
+  const [resolvedTheme, setResolvedTheme] = useState<Theme>('dunkel')
   const [mounted, setMounted] = useState(false)
 
   useLayoutEffect(() => {
@@ -32,17 +32,11 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     const html = document.documentElement
     html.dataset.theme = newTheme
 
-    if (newTheme === 'dunkel') {
-      html.classList.add('dark')
-      html.classList.remove('light')
-      html.style.colorScheme = 'dark'
-      setResolvedTheme('dunkel')
-    } else {
-      html.classList.remove('dark')
-      html.classList.add('light')
-      html.style.colorScheme = 'light'
-      setResolvedTheme('hell')
-    }
+    const isLight = newTheme === 'hell'
+    html.classList.toggle('dark', !isLight)
+    html.classList.toggle('light', isLight)
+    html.style.colorScheme = isLight ? 'light' : 'dark'
+    setResolvedTheme(newTheme)
   }
 
   const setTheme = (newTheme: Theme) => {
@@ -83,10 +77,11 @@ export function useTheme() {
 
 function getCookieTheme() {
   if (typeof document === 'undefined') return null
-  const match = document.cookie.match(/(?:^|;\s*)theme=(dunkel|hell)(?:;|$)/)
+  const match = document.cookie.match(/(?:^|;\s*)theme=(dunkel|hell|carbon|glass)(?:;|$)/)
   return match?.[1] || null
 }
 
 function normalizeTheme(value?: string | null): Theme {
-  return value === 'hell' ? 'hell' : 'dunkel'
+  if (value === 'hell' || value === 'carbon' || value === 'glass') return value
+  return 'dunkel'
 }

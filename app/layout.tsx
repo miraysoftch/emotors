@@ -59,9 +59,9 @@ export const viewport: Viewport = {
 
 const themeScript = `
 try {
-  const cookieMatch = document.cookie.match(/(?:^|;\\s*)theme=(dunkel|hell)(?:;|$)/);
+  const cookieMatch = document.cookie.match(/(?:^|;\\s*)theme=(dunkel|hell|carbon|glass)(?:;|$)/);
   const stored = localStorage.getItem('theme') || (cookieMatch && cookieMatch[1]) || 'dunkel';
-  const resolved = stored === 'hell' ? 'hell' : 'dunkel';
+  const resolved = ['hell', 'dunkel', 'carbon', 'glass'].includes(stored) ? stored : 'dunkel';
   document.documentElement.classList.toggle('dark', resolved !== 'hell');
   document.documentElement.classList.toggle('light', resolved === 'hell');
   document.documentElement.dataset.theme = resolved;
