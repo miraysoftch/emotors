@@ -422,21 +422,34 @@ export default function AccountPage() {
       setLoading(true)
       setMessage('')
     }
-    const response = await fetch(`/api/account?email=${encodeURIComponent(email)}`, { credentials: 'include', cache: 'no-store' })
-    const data = await response.json()
-    if (!options.silent) setLoading(false)
-    if (!response.ok) {
-      if (!options.silent) setMessage(data.error || 'Kontodaten konnten nicht geladen werden.')
-      return
-    }
-    setAccountData(data)
-    if (!options.silent) {
-      setAddressForm((current) => ({
-        ...current,
-        firstName: data.account.firstName || '',
-        lastName: data.account.lastName || '',
-        phone: data.account.phone || '',
-      }))
+    try {
+      const response = await fetch(`/api/account?email=${encodeURIComponent(email)}`, { credentials: 'include', cache: 'no-store' })
+      if (!options.silent) setLoading(false)
+      if (!response.ok) {
+        try {
+          const errorData = await response.json()
+          if (!options.silent) setMessage(errorData.error || 'Kontodaten konnten nicht geladen werden.')
+        } catch {
+          if (!options.silent) setMessage('Kontodaten konnten nicht geladen werden.')
+        }
+        return
+      }
+      const data = await response.json()
+      setAccountData(data)
+      if (!options.silent) {
+        setAddressForm((current) => ({
+          ...current,
+          firstName: data.account.firstName || '',
+          lastName: data.account.lastName || '',
+          phone: data.account.phone || '',
+        }))
+      }
+    } catch (error) {
+      if (!options.silent) {
+        setLoading(false)
+        setMessage('Ein Fehler ist aufgetreten.')
+      }
+      console.error('[v0] Account loading error:', error)
     }
   }
 

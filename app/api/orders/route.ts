@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getStoredOrders } from '@/lib/orders-store'
+import { POST as createOrder } from '@/app/api/admin/orders/route'
+
+export const POST = createOrder
 
 export async function GET(request: NextRequest) {
   const orderNumber = request.nextUrl.searchParams.get('orderNumber')

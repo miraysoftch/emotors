@@ -3,6 +3,7 @@ import { Footer } from '@/components/navigation/Footer'
 import { FinancingCalculator } from '@/components/sections/FinancingCalculator'
 import { db } from '@/lib/db'
 import { products } from '@/lib/db/schema'
+import { sql } from 'drizzle-orm'
 
 async function getFinancingProducts() {
   try {
@@ -11,10 +12,19 @@ async function getFinancingProducts() {
       return mockFinancingProducts()
     }
 
-    // Get all products that have financing available and are active
+    // Get only the fields needed to avoid array/JSON mapping issues
     const allProducts = await db
-      .select()
+      .select({
+        id: products.id,
+        slug: products.slug,
+        title: products.title,
+        price: products.price,
+        monthly_price: products.monthly_price,
+        financing_available: products.financing_available,
+        active: products.active,
+      })
       .from(products)
+      .where(sql`${products.active} = true AND ${products.financing_available} = true`)
     
     return allProducts && allProducts.length > 0 ? allProducts : mockFinancingProducts()
   } catch (error) {

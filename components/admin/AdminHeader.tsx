@@ -70,6 +70,10 @@ const navGroups = [
       { label: 'Banner', href: '/admin/banners', icon: PanelsTopLeft, description: 'Marquee und Hinweise' },
       { label: 'Aktionen & Feiertage', href: '/admin/special-days', icon: Sparkles, description: 'Special Days Campaigns' },
       { label: 'Inhalte', href: '/admin/pages', icon: FileText, description: 'Seiteninhalte' },
+      { label: 'FAQ', href: '/admin/faq', icon: MessageSquare, description: 'Fragen und Antworten' },
+      { label: 'Features', href: '/admin/features', icon: Sparkles, description: 'Produktvorteile verwalten' },
+      { label: 'Navigation', href: '/admin/navigation', icon: PanelsTopLeft, description: 'Menüs und Links' },
+      { label: 'Marketplace', href: '/admin/marketplace', icon: ShoppingBag, description: 'Zusatzangebote und Services' },
     ],
   },
   {

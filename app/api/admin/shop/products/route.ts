@@ -10,7 +10,27 @@ function isAdmin(req: NextRequest): boolean {
 
 export async function GET(req: NextRequest) {
   try {
-    const allProducts = await db.select().from(products).orderBy(desc(products.createdAt))
+    const allProducts = await db
+      .select({
+        id: products.id,
+        slug: products.slug,
+        title: products.title,
+        price: products.price,
+        description: products.description,
+        short_description: products.short_description,
+        category_id: products.category_id,
+        brand: products.brand,
+        stock_quantity: products.stock_quantity,
+        featured: products.featured,
+        bestseller: products.bestseller,
+        active: products.active,
+        archived: products.archived,
+        image: products.image,
+        createdAt: products.createdAt,
+        updatedAt: products.updatedAt,
+      })
+      .from(products)
+      .orderBy(desc(products.createdAt))
     return NextResponse.json(allProducts)
   } catch (error) {
     console.error('[Get Products Error]', error)

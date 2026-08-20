@@ -27,14 +27,18 @@ export default function ForgotPasswordPage() {
         body: JSON.stringify({ email }),
       })
 
-      const data = await response.json()
-
       if (!response.ok) {
-        setError(data.error || 'Bir hata oluştu.')
+        try {
+          const errorData = await response.json()
+          setError(errorData.error || 'Bir hata oluştu.')
+        } catch {
+          setError('Bir hata oluştu.')
+        }
         setLoading(false)
         return
       }
 
+      const data = await response.json()
       console.log('[v0] Password reset requested successfully')
       setSuccess(data.message)
       setStep('message')
