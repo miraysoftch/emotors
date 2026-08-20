@@ -44,6 +44,19 @@ interface TimeLeft {
   seconds: number
 }
 
+const demoCountdownProduct: Product = {
+  id: -1,
+  title: 'MK Urban E-Scooter Demo',
+  slug: 'demo-countdown-angebot',
+  price: 1490,
+  discount_price: 1190,
+  discount_percentage: 20,
+  image: '/images/demo-countdown-scooter.png',
+  brand: 'MK-eMotors Dornach',
+  stock_quantity: 4,
+}
+const demoCountdownProducts = [demoCountdownProduct]
+
 function getDeadline(products: Product[]) {
   const dates = products
     .map((product) => product.sales_end ? new Date(product.sales_end).getTime() : 0)
@@ -69,17 +82,16 @@ function getTimeLeft(deadline: number): TimeLeft {
 
 export function CountdownProductsSection({ products, compact = false }: { products: Product[]; compact?: boolean }) {
   const [timeLeft, setTimeLeft] = useState<TimeLeft>({ days: 0, hours: 0, minutes: 0, seconds: 0 })
+  const offerProducts = products?.length > 0 ? products : demoCountdownProducts
 
   useEffect(() => {
-    const deadline = getDeadline(products)
+    const deadline = getDeadline(offerProducts)
     setTimeLeft(getTimeLeft(deadline))
     const timer = window.setInterval(() => setTimeLeft(getTimeLeft(deadline)), 1000)
     return () => window.clearInterval(timer)
-  }, [products])
+  }, [offerProducts])
 
-  if (!products || products.length === 0) return null
-
-  const visibleProducts = products.slice(0, compact ? 1 : 3)
+  const visibleProducts = offerProducts.slice(0, compact ? 1 : 3)
 
   const content = (
     <>
@@ -91,7 +103,7 @@ export function CountdownProductsSection({ products, compact = false }: { produc
       >
         <p className="mb-3 text-xs font-black uppercase tracking-[0.28em] text-accent">Limited Deal</p>
         <h2 className={`${compact ? 'text-3xl md:text-4xl' : 'text-4xl md:text-5xl'} font-black tracking-tight`}>
-          <SplitTitle title="Angebote mit Countdown" />
+          <SplitTitle title="Countdown Angebote" />
         </h2>
         <p className="mt-3 text-base text-muted-foreground md:text-lg">
           Limitierte E-Mobility Deals mit direkter Farbauswahl.
